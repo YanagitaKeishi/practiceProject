@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.app.dao.MaterialDao">
+	
+	<resultMap id="Material" type="com.example.app.domain.Material">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="publisher" column="publisher"/>
+		<result property="note" column="note"/>
+		<result property="materialTypeId" column="material_type_id"/>
+		<result property="materialTypeName" column="material_type_name"/>
+		<result property="created" column="created"/>
+		<result property="status" column="status"/>
+	</resultMap>
+	
+	<select id="selectAll" resultMap="Material">
+		SELECT 
+			materials.id, materials.name, materials.publisher,
+			materials.note, materials.created, materials.status,
+			material_types.id, material_types.name AS material_type_name
+		FROM materials
+		JOIN material_types
+		ON materials.material_type_id = material_types.id
+		WHERE materials.status = 'ACT'
+	</select>
+	
+	<select id="selectById" resultMap="Material" parameterType="int">
+		SELECT 
+			materials.id, materials.name, materials.publisher,
+			materials.note, materials.created, materials.status,
+			materials.material_type_id, material_types.name AS material_type_name
+		FROM materials
+		JOIN material_types
+		ON materials.material_type_id = material_types.id
+		WHERE materials.id = #{id}
+	</select>
+	
+	<insert id="insert" parameterType="com.example.app.domain.Material">
+		INSERT INTO  materials (name, publisher, note, material_type_id, created)
+		VALUES (#{name}, #{publisher}, #{note}, #{materialTypeId}, NOW())
+	</insert>
+	
+	<update id="statusUpdate" parameterType="com.example.app.domain.Material">
+		UPDATE materials
+		SET status = 'DEL'
+		WHERE materials.id = #{id}
+	</update>
+	
+	<update id="update" parameterType="com.example.app.domain.Material">
+		UPDATE materials
+		SET name = #{name}, publisher = #{publisher}, note = #{note},
+			material_type_id = #{materialTypeId}
+		WHERE materials.id = #{id}
+	</update>
+</mapper>
